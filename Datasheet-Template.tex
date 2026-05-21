@@ -1,0 +1,450 @@
+\documentclass[11pt]{article}
+
+%------------------------------------------------
+% Page geometry
+%------------------------------------------------
+\usepackage[left=0.75in, right=0.75in, top=0.75in, bottom=0.75in]{geometry}
+
+
+
+%------------------------------------------------
+% Variables (edit per part)
+%------------------------------------------------
+% Document Stuff:
+\newcommand{\ProductTitle}{\LaunchType{} \Stackup, \PartFilterOrder{} Order, \CenterFreqGHz{} GHz Center Frequency Filter}
+\newcommand{\DocRev}{Rev. - | PRELIMINARY}
+
+% Part info:
+\newcommand{\PartNumber}{PSF1029223}
+\newcommand{\PartSize}{11.76 x 6.53 x 1.5 mm}
+\newcommand{\PartFilterOrder}{5th}
+\newcommand{\CenterFreqGHz}{14.125}
+\newcommand{\PercentBW}{5.3}
+\newcommand{\Stackup}{AQ210}
+\newcommand{\LaunchType}{SMT}
+
+
+% Performance metrics:
+\newcommand{\PartMaxIL}{1.32}
+\newcommand{\PartTypIL}{1.15}
+\newcommand{\PartMaxRL}{12}
+\newcommand{\PartTypRL}{15}
+\newcommand{\MaxRej}{30}
+\newcommand{\MinRej}{30}
+\newcommand{\TypRej}{50}
+\newcommand{\FreqRangeGHz}{13.55--14.72}
+\newcommand{\RejRangeLowGHz}{0--12.98}
+\newcommand{\RejRangeHighGHz}{15.34--30.0}
+
+% Plot data disclaimers / descriptions:
+\newcommand{\PlotDisclaimer}{\textit{Plots above are preliminary simulation data.}}
+%\newcommand{\PlotDisclaimer}{\textit{Plots above are measured, probed data.}}
+
+% Generic Variables:
+\newcommand{\DocDate}{\today}
+\newcommand{\CompanyName}{Nuvotronics, Inc.}
+\newcommand{\CompanyLine}{2305 Presidential Dr, Durham, NC 27703}
+\newcommand{\CompanyWeb}{www.nuvotronics.com}
+
+
+
+%------------------------------------------------
+% Fonts and colors
+%------------------------------------------------
+\usepackage{fontspec}
+
+\setsansfont[
+	Path = fonts/,
+	UprightFont = FunnelSans-Regular.ttf,
+	BoldFont    = FunnelSans-Bold.ttf,
+	ItalicFont  = FunnelSans-Italic.ttf,
+	BoldItalicFont = FunnelSans-BoldItalic.ttf
+]{Funnel Sans}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{xcolor}
+\definecolor{DatasheetBlue}{RGB}{0,70,140}
+\definecolor{headtext}{RGB}{0, 0, 0}      % header text color (black)
+\definecolor{GradientLeft}{RGB}{0,83,138}
+\definecolor{GradientRight}{RGB}{9,23,47} % darker
+\definecolor{CellGray}{RGB}{248,248,248}
+\definecolor{GridGray}{RGB}{200,200,200}
+
+%------------------------------------------------
+% Layout helpers
+%------------------------------------------------
+\usepackage{multicol}
+\setlength{\columnsep}{0.25in}
+
+%------------------------------------------------
+% Graphics and tables
+%------------------------------------------------
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{caption}
+\captionsetup[figure]{position=above}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{dashrule}
+\usepackage{tikz}
+\usepackage{nicematrix}
+\usepackage{ragged2e}
+
+
+\setlist[itemize]{leftmargin=*, nosep}
+\setlist[itemize,2]{leftmargin=1.5em}% second level narrower
+\definecolor{lightgraypanel}{RGB}{240,240,240}
+
+%------------------------------------------------
+% Header / footer
+%------------------------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+
+% Header
+\renewcommand{\headrulewidth}{0pt}
+\lhead{\includegraphics[height=0.85cm]{images/company-logo.png}}
+\rhead{
+	%\includegraphics[height=1cm]{images/strataworks-logo.png} \;
+	\thepage
+}
+\setlength{\headheight}{18pt}
+\setlength{\headsep}{18pt}
+
+% Footer text
+\fancyfoot[L]{\scriptsize \DocRev\ |\ \PartNumber{} Datasheet}
+\fancyfoot[R]{\scriptsize \textcopyright\ \CompanyName |\CompanyLine|\CompanyWeb}
+
+\renewcommand{\footrule}{%
+	\hbox to\headwidth{%
+		\begin{tikzpicture}[baseline]
+			\path[
+			shade,
+			left color=GradientLeft,
+			right color=GradientRight,
+			shading angle=90
+			] (0,0) rectangle (\headwidth,4pt);
+		\end{tikzpicture}%
+	}%
+}
+
+\setlength{\footskip}{18pt}
+
+
+
+
+%------------------------------------------------
+% Section styling
+%------------------------------------------------
+\usepackage{titlesec}
+\titleformat{\section}
+{\color{DatasheetBlue}\bfseries\large}
+{}
+{0pt}
+{}
+\titlespacing*{\section}{0pt}{8pt}{4pt}
+
+\newcommand{\SectionRule}{%
+	\vspace{-2pt}
+	\par\noindent\rule{\linewidth}{0.8pt}
+	\vspace{6pt}
+}
+
+\newcommand{\PageBreak}{
+	\clearpage
+}
+
+%------------------------------------------------
+% Title block styling
+%------------------------------------------------
+\newcommand{\DatasheetTitleBlock}{%
+	\noindent
+	\begin{tikzpicture}
+		% Gradient rectangle spanning full text width
+		\path[shade, left color=GradientLeft, right color=GradientRight, shading angle=90]
+		(0,0) rectangle (\textwidth,1.25cm);
+
+		% Main title (white)
+		\node[anchor=west, text=white, font=\bfseries\Large] at (0.35cm,0.85cm) {\PartNumber{} Datasheet};
+
+		% Subtitle (lighter blue/cyan)
+		\node[anchor=west, text=cyan!40!white, font=\bfseries\large] at (0.35cm,0.35cm) {\ProductTitle{}};
+	\end{tikzpicture}%
+}
+
+%------------------------------------------------
+% Line Break for Readibility
+%------------------------------------------------
+\newcommand{\SmallBreak}{
+	\vspace*{0.1cm}
+	\textcolor{DatasheetBlue}{\hdashrule[0.5ex]{5cm}{1pt}{1pt 1pt}}
+	\vspace*{0.1cm}
+}
+
+%------------------------------------------------
+% Captions: compact
+%------------------------------------------------
+\usepackage{caption}
+
+\DeclareCaptionFormat{bluebox}{%
+	\colorbox{DatasheetBlue}{%
+		\parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+			\centering
+			#1#2#3%
+		}%
+	}%
+}
+
+% Global style (your current look)
+\captionsetup{
+	format=bluebox,
+	labelfont={bf, color=white},
+	textfont={bf, color=white},
+	justification=centering,
+	singlelinecheck=false,
+	skip=6pt
+}
+
+% Force captions above content
+\captionsetup[figure]{position=above}
+
+\begin{document}
+
+	%================================================
+	% PAGE 1 (two-column)
+	%================================================
+
+	\DatasheetTitleBlock{}
+	% --- Page 1 content: 1/3 (left) + 2/3 (right) ---
+	\noindent
+	\begin{minipage}[t]{0.5\textwidth}
+		\vspace{0pt} % align tops
+
+		\section*{General Description}
+		The \PartNumber{} is a \PartFilterOrder{} order interdigital filter, with a pass-band of \FreqRangeGHz{} GHz. It provides <\PartMaxIL{}dB insertion loss with high out of band rejection. The mounting interface provided is a \LaunchType{} interface compatible with standard attach processes.
+
+		\vspace*{10pt}
+
+		\section*{Applications}
+		\begin{itemize}
+			\item General Purpose BPF
+
+		\end{itemize}
+		\vspace*{10pt}
+
+		\section*{Benefits}
+		\begin{itemize}
+			\item Low Loss
+			\item High Rejection
+			\item High Repeatability
+			\item Compact Size
+			\item CTE matched to PCB
+			%\item Guaranteed Performance
+		\end{itemize}
+
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.45\textwidth}
+		\vspace{0pt} % align tops
+
+
+		\begin{center}
+			\begin{tikzpicture}
+				\node[
+				inner sep=0pt,
+				rounded corners=6pt,
+				clip
+				] {\includegraphics[width=0.95\linewidth]{images/product-image.png}};
+			\end{tikzpicture}
+		\end{center}
+
+		\vspace{6pt}
+		\begingroup
+		\small
+		\renewcommand{\arraystretch}{1.8}
+
+		\begin{NiceTabular*}{\linewidth}{
+	  		>{\RaggedRight\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}p{0.35\linewidth}
+			>{\RaggedRight\arraybackslash\hyphenpenalty=10000\exhyphenpenalty=10000}p{0.55\linewidth}
+			}[
+			hvlines,
+			rules/color=GridGray,
+			rules/width=0.6pt
+			]
+
+
+			\rowcolor{DatasheetBlue}
+			\Block{1-2}{\color{white}\bfseries Features} \\
+
+			\rowcolor{CellGray}\textbf{Frequency Range} &
+			\FreqRangeGHz{} GHz, BPF \\
+
+			\rowcolor{CellGray}\textbf{Insertion Loss} &
+			<\PartMaxIL{} dB across pass-band \\
+
+			\rowcolor{CellGray}\textbf{Rejection} &
+			>\MinRej{} dB out-of-band \\
+
+			\rowcolor{CellGray}\textbf{Package} &
+			\PartSize, bottom-side SMT launches for reflow or epoxy attach \\
+		\end{NiceTabular*}
+		\endgroup
+
+
+
+	\end{minipage}
+
+
+	\PageBreak
+
+	%================================================
+% PAGE 2 (one-column) - Performance plots and tables
+%================================================
+\section*{Performance Specifications}
+
+\begin{multicols}{2}
+	\centering
+	\begin{minipage}{\linewidth}
+		\centering
+		\captionof{table}{\textbf{RF Performance}}
+		\small
+		\setlength{\tabcolsep}{4pt}        % tighter columns
+		\renewcommand{\arraystretch}{1.5} % a bit more row height
+
+		\begin{tabularx}{\linewidth}{@{} >{\raggedright\arraybackslash}X
+				>{\raggedright\arraybackslash}m{0.22\linewidth}
+				c c c
+				>{\raggedright\arraybackslash}m{0.12\linewidth} @{}}
+			\toprule
+			\bfseries Parameter &
+			\bfseries Freq. Range (GHz) &
+			\bfseries Min. &
+			\bfseries Typ. &
+			\bfseries Max. &
+			\bfseries Unit \\
+			\midrule
+			Return Loss    & \FreqRangeGHz & \PartMaxRL & \PartTypRL  & --  & dB \\
+			Insertion Loss & \FreqRangeGHz & -- &  \PartTypIL & \PartMaxIL & dB \\
+			Lower Rejection & \RejRangeLowGHz & \MinRej & \TypRej & -- & dB \\
+			Upper Rejection & \RejRangeHighGHz & \MinRej & \TypRej & -- & dB \\
+			\bottomrule
+		\end{tabularx}
+	\end{minipage}
+
+	\columnbreak
+
+	\begin{minipage}{\linewidth}
+		\captionof{table}{Absolute Maximum Ratings}
+		\small
+		\setlength{\tabcolsep}{4pt}
+		\renewcommand{\arraystretch}{1.5}
+
+		\begin{tabularx}{\linewidth}{@{} >{\raggedright\arraybackslash}m{0.42\linewidth}
+				>{\raggedright\arraybackslash}X @{}}
+			\toprule
+			CW Power        & 5 W \\
+			Operating Temp. & -40\textdegree C to 85\textdegree C \\
+			Solder Reflow   & 260\textdegree C max. for 10 seconds, 3 cycles \\
+			Epoxy Attach    & 150\textdegree C max. for 90 minutes \\
+			Mechanical Vibration MIL-STD-883 M2026.4 (Cond. 1F) & 20.0 Grms \\
+			Mechanical Shock MIL-STD-883 M2002.4 (Cond. A) & 500 G \\
+			\bottomrule
+		\end{tabularx}
+	\end{minipage}
+
+\end{multicols}
+
+\SectionRule
+
+\section*{Typical Performance}
+\begin{figure}[!ht]
+	\centering
+	\caption{RF performance}
+	\includegraphics[width=0.85\linewidth]{images/sparams.png}
+\end{figure}
+
+\begin{center}
+	\PlotDisclaimer
+\end{center}
+
+\PageBreak
+
+%================================================
+% PAGE 3 (one-column) - PCB Info
+%================================================
+\section*{PCB Guidelines}
+
+\begin{figure}[!ht]
+	\centering
+	\caption{Recommended PCB Stackup}
+	\includegraphics[width=0.85\linewidth]{images/pcb-stackup.png}
+\end{figure}
+
+\SectionRule
+\subsection*{PCB Design Notes:}
+\begin{enumerate}
+	\item Use blind vias (Layer 1 to Layer 2 pair) around RF traces.
+	\item Use solid ground pour on all ground pins of the part to prevent parasitic inductances.
+	\item If deviating from the above stackup, the recommended PCB footprint may need to be adjusted for tuning purposes. Please contact Nuvotronics for assistance with tuning.
+	\item Follow stenciling guidelines outlined in IPC-7525C to prevent over-pasting RF launches (see "PolyStrata SMT Assembly Guide" application note for details).
+\end{enumerate}
+\PageBreak
+%================================================
+% PAGE 4 (one-column) - Mechanical information
+%================================================
+\section*{Mechanical Information}
+
+\begin{figure}[h]
+	\centering
+	\caption{2D Mechanical Drawing}
+	\textit{Dimensions in mm}
+	\includegraphics[width=0.85\linewidth]{images/2D-drawing.png}
+\end{figure}
+
+\begin{center}
+	\small
+	\textit{Note: Manufacturing tethers extend past the indicated dimensions of the part. See STEP model for details.}
+\end{center}
+
+\section*{Additional Information}
+
+
+\begin{minipage}{\linewidth}
+	\centering
+	\captionof{table}{Handling and Ordering Information}
+	\small
+	\setlength{\tabcolsep}{4pt}
+	\renewcommand{\arraystretch}{1.5}
+
+	\begin{tabularx}{\linewidth}{@{} >{\raggedright\arraybackslash}m{0.48\linewidth}
+			>{\raggedright\arraybackslash}X @{}}
+		\toprule
+		Storage & IAW IPC-4553A \\
+		ESD Sensitivity & None \\
+		Ordering Information & \PartNumber{} \\
+		Standard Packaging & Gel Pack \\
+		Alternative Packaging & Tape \& Reel \\
+		Component Termination Finish & Immersion Gold \\
+		\bottomrule
+	\end{tabularx}
+\end{minipage}
+\begin{center}
+	\small
+	\textit{Note: Detailed handling guidelines can be found in the "General Handling Guidelines" and "PolyStrata SMT Assembly Guide" application notes (see link below).}
+\end{center}
+
+\vfill
+\begin{itemize}
+	\item Footprint DXF is available on request.
+	\item Application notes on PCB integration are available at: \href{https://www.nuvotronics.com/resources/}{https://www.nuvotronics.com/resources/}
+\end{itemize}
+\PageBreak
+
+\end{document}

@@ -191,6 +191,7 @@ def build_part(
     assets_dir: Path,
     output_root: Path,
     skip_compile: bool = False,
+    engine: str = "lualatex",
 ) -> Path | None:
     part_number = str(row["PartNumber"]).strip()
     print(f"\n=== Building {part_number} ===")
@@ -253,16 +254,16 @@ def build_part(
     if skip_compile:
         return tex_out
 
-    # Compile with xelatex (twice for refs/TOC if you add them later)
+    # Compile (twice for refs/TOC if you add them later)
     for pass_n in (1, 2):
         result = subprocess.run(
-            ["xelatex", "-interaction=nonstopmode", "-halt-on-error", tex_out.name],
+            [engine, "-interaction=nonstopmode", "-halt-on-error", tex_out.name],
             cwd=part_dir,
             capture_output=True,
             text=True,
         )
         if result.returncode != 0:
-            print(f"  xelatex pass {pass_n} FAILED. Last 40 lines of log:")
+            print(f"  {engine} pass {pass_n} FAILED. Last 40 lines of log:")
             print("\n".join(result.stdout.splitlines()[-40:]))
             return None
 
@@ -280,8 +281,11 @@ def main():
     ap.add_argument("--template", default="Datasheet-Template.tex", help="LaTeX template path")
     ap.add_argument("--assets-dir", default="assets", help="Dir containing fonts/, images/, touchstone files")
     ap.add_argument("--output-dir", default="output", help="Where built PDFs go")
+    ap.add_argument("--engine", default="lualatex",
+                    choices=["lualatex", "xelatex"],
+                    help="LaTeX engine (default: lualatex; both support fontspec)")
     ap.add_argument("--only", help="Build only this part number")
-    ap.add_argument("--no-compile", action="store_true", help="Just write .tex, skip xelatex")
+    ap.add_argument("--no-compile", action="store_true", help="Just write .tex, skip compile")
     args = ap.parse_args()
 
     sheet = Path(args.spreadsheet)
@@ -303,7 +307,8 @@ def main():
 
     built = []
     for _, row in df.iterrows():
-        result = build_part(row, template_path, assets_dir, output_root, skip_compile=args.no_compile)
+        result = build_part(row, template_path, assets_dir, output_root,
+                            skip_compile=args.no_compile, engine=args.engine)
         if result:
             built.append(result)
 
