@@ -1,0 +1,2 @@
+PartNumber,DocRev,PartSize,PartFilterOrder,CenterFreqGHz,PercentBW,Stackup,LaunchType,PartMaxIL,PartTypIL,PartMaxRL,PartTypRL,MaxRej,MinRej,TypRej,PassbandLowGHz,PassbandHighGHz,RejLowStartGHz,RejLowEndGHz,RejHighStartGHz,RejHighEndGHz,Measured,S2PFile,ProductImage,StackupImage,MechDrawing,PlotFreqMinGHz,PlotFreqMaxGHz
+PSF1029223,Rev. - | PRELIMINARY,11.76 x 6.53 x 1.5 mm,5th,14.125,5.3,AQ210,SMT,1.32,1.15,12,15,30,30,50,13.55,14.72,0,12.98,15.34,30.0,FALSE,touchstone/PSF1029223.s2p,images/PSF1029223_product.png,images/PSF1029223_stackup.png,images/PSF1029223_2D.png,10,18
