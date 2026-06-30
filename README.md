@@ -16,7 +16,7 @@ Each row in `parts.csv` (or `.xlsx`) becomes one PDF.
 ## Setup
 
 ```bash
-pip install scikit-rf pandas matplotlib openpyxl
+pip install -r requirements.txt
 ```
 
 Plus a working LaTeX install with `xelatex` (TeX Live or MiKTeX) and the

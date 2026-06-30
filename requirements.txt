@@ -1,0 +1,43 @@
+# GDS-to-PCB pipeline — Python dependencies
+#
+# Recommended: a Python 3.10–3.12 virtual environment.
+# The OpenCascade wheels (cadquery-ocp) currently publish for CPython 3.10–3.13;
+# 3.10–3.12 is the safest band across every dependency here.
+#
+# Some pieces are NOT pip-installable and are noted at the bottom.
+
+# ── Datasheet Generation Core ──────────────────────────────────────────
+scikit-rf
+pandas
+matplotlib
+openpyxl
+
+# ── Core CAD / geometry ────────────────────────────────────────────────
+# Used by: gds_to_step.py, step_to_datasheet_render.py
+cadquery>=2.4            # STEP I/O + tessellation; pulls in cadquery-ocp
+                         # (the OpenCascade / OCP bindings the render script
+                         # imports for XCAF color reading). No need to list OCP
+                         # separately — it installs as a cadquery dependency.
+
+# ── GDS / layout + footprint export ────────────────────────────────────
+# Used by: gds_to_step.py, gds_to_footprint_dxf.py
+klayout                  # standalone KLayout Python module: GDS read, layer extraction
+ezdxf                    # sized DXF footprint generation (paste/copper/solder layers)
+
+# ── Datasheet rendering ────────────────────────────────────────────────
+# Used by: step_to_datasheet_render.py
+trimesh                  # mesh container between OCP tessellation and pyrender
+pyrender                 # offscreen GL rendering of the STEP model
+imageio                  # PNG output
+PyOpenGL                 # GL bindings pyrender uses (EGL / OSMesa backends)
+numpy<2                  # pyrender (0.1.45) predates NumPy 2.0; this pin avoids
+                         # removed-alias breakage. Drop the cap if you move to a
+                         # pyrender build that's NumPy-2 clean.
+
+
+# ── Not pip-installable (system / build deps) ──────────────────────────
+# • An OpenGL backend for headless pyrender:
+#     EGL    -> usually present with the GPU/Mesa drivers (libEGL)
+#     OSMesa -> apt: libosmesa6   (set PYOPENGL_PLATFORM=osmesa)
+# • Altium DelphiScript (.pas) generation uses only the Python standard
+#   library, so it needs nothing from this file.
