@@ -25,11 +25,19 @@ NOTE ON HEADLESS RENDERING:
 
 import os
 
-# Must be set before pyrender/OpenGL is imported.
-os.environ.setdefault("PYOPENGL_PLATFORM", "egl")
+import sys
+
+# Select the OpenGL backend BEFORE pyrender/OpenGL is imported.
+#   Linux (often headless): EGL is the right offscreen backend.
+#   Windows / macOS: leave it unset so pyrender uses its default pyglet
+#     context (a hidden window). Windows has no standard EGL library, so
+#     forcing EGL there raises "Unable to load EGL library".
+# Override explicitly by setting PYOPENGL_PLATFORM in the environment
+# (e.g. 'osmesa' for a truly headless box without a GPU).
+if "PYOPENGL_PLATFORM" not in os.environ and sys.platform.startswith("linux"):
+    os.environ["PYOPENGL_PLATFORM"] = "egl"
 
 import argparse
-import sys
 
 import numpy as np
 import trimesh
@@ -56,8 +64,8 @@ from OCP.IFSelect import IFSelect_RetDone
 # --------------------------------------------------------------------------- #
 
 # Material appearance (baseColorFactor is linear RGBA, 0-1).
-GOLD_BASE_COLOR = [0.83, 0.69, 0.21, 1.0]
-GREY_BASE_COLOR = [0.4, 0.4, 0.4, 1.0]
+GOLD_BASE_COLOR = [0.83, 0.69, 0.22, 1.0]
+GREY_BASE_COLOR = [0.63, 0.63, 0.63, 1.0]
 
 # Set < 1.0 for the "semi-transparent grey plastic" look. 1.0 = fully opaque.
 GREY_ALPHA = 1.0
@@ -73,9 +81,9 @@ FIT_MARGIN = 1.25                        # padding around the model in frame
 
 # Lighting. Tuned to keep highlights from clipping (gold reads as gold, not pale
 # yellow). Raise AMBIENT for flatter/brighter, raise KEY/FILL for more contrast.
-AMBIENT_LIGHT = 0.38         # uniform base fill, 0-1
-KEY_LIGHT_INTENSITY = 0.75     # main directional light
-FILL_LIGHT_INTENSITY = 0.2    # softer fill lights (x2) to lift shadows
+AMBIENT_LIGHT = 0.30          # uniform base fill, 0-1
+KEY_LIGHT_INTENSITY = 1.6     # main directional light
+FILL_LIGHT_INTENSITY = 0.6    # softer fill lights (x2) to lift shadows
 
 
 # --------------------------------------------------------------------------- #

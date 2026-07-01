@@ -14,9 +14,16 @@ Each row in `parts.csv` (or `.xlsx`) becomes one PDF.
 4. Runs `xelatex` twice to produce the final PDF.
 
 ## Setup
+***Note: Requires python 3.12 or older due to the numpy<2 requirement***
 
 ```bash
 pip install -r requirements.txt
+```
+
+**Additional Windows Setup:**
+
+```bash
+pip install "pyglet<2"
 ```
 
 Plus a working LaTeX install with `xelatex` (TeX Live or MiKTeX) and the
