@@ -24,8 +24,9 @@ NOTE ON HEADLESS RENDERING:
 """
 
 import os
-
+import glob
 import sys
+
 
 # Select the OpenGL backend BEFORE pyrender/OpenGL is imported.
 #   Linux (often headless): EGL is the right offscreen backend.
@@ -64,15 +65,15 @@ from OCP.IFSelect import IFSelect_RetDone
 # --------------------------------------------------------------------------- #
 
 # Material appearance (baseColorFactor is linear RGBA, 0-1).
-GOLD_BASE_COLOR = [0.83, 0.69, 0.22, 1.0]
-GREY_BASE_COLOR = [0.63, 0.63, 0.63, 1.0]
+GOLD_BASE_COLOR = [211.0/255.0, 175.0/255.0, 55.0/255.0, 1.0]
+GREY_BASE_COLOR = [0.7, 0.7,0.7, 1.0]
 
 # Set < 1.0 for the "semi-transparent grey plastic" look. 1.0 = fully opaque.
-GREY_ALPHA = 1.0
+GREY_ALPHA = 0.6
 
 # Tessellation fidelity. Larger = coarser/faster ("crude" datasheet look).
-LINEAR_DEFLECTION = 0.1
-ANGULAR_DEFLECTION = 0.3
+LINEAR_DEFLECTION = 0.075
+ANGULAR_DEFLECTION = 0.225
 
 # Render defaults.
 DEFAULT_RESOLUTION = (1200, 1200)
@@ -81,9 +82,9 @@ FIT_MARGIN = 1.25                        # padding around the model in frame
 
 # Lighting. Tuned to keep highlights from clipping (gold reads as gold, not pale
 # yellow). Raise AMBIENT for flatter/brighter, raise KEY/FILL for more contrast.
-AMBIENT_LIGHT = 0.30          # uniform base fill, 0-1
-KEY_LIGHT_INTENSITY = 1.6     # main directional light
-FILL_LIGHT_INTENSITY = 0.6    # softer fill lights (x2) to lift shadows
+AMBIENT_LIGHT = 0.2         # uniform base fill, 0-1
+KEY_LIGHT_INTENSITY = 1.0    # main directional light
+FILL_LIGHT_INTENSITY = 0.5    # softer fill lights (x2) to lift shadows
 
 
 # --------------------------------------------------------------------------- #
@@ -299,7 +300,7 @@ def render_view(scene, bounds, view, resolution):
     return color
 
 
-def render_datasheet_images(step_path, output_prefix, resolution=DEFAULT_RESOLUTION,
+def render_datasheet_images(step_path, output_prefix, output_directory, resolution=DEFAULT_RESOLUTION,
                             views=("isometric", "top")):
     """Top-level pipeline: STEP file -> one PNG per requested view."""
     solids = load_solids(step_path)
@@ -324,7 +325,7 @@ def render_datasheet_images(step_path, output_prefix, resolution=DEFAULT_RESOLUT
     outputs = []
     for view in views:
         image = render_view(scene, bounds, view, resolution)
-        out_path = f"{output_prefix}_{view}.png"
+        out_path = os.path.join(output_directory, f"{output_prefix}_{view}.png")
         imageio.imwrite(out_path, image)
         outputs.append(out_path)
         print(f"wrote {out_path}")
@@ -336,32 +337,44 @@ def render_datasheet_images(step_path, output_prefix, resolution=DEFAULT_RESOLUT
 # --------------------------------------------------------------------------- #
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Render preliminary datasheet images from a mechanical STEP model."
-    )
-    parser.add_argument("step_file", help="Input STEP file (e.g. gds_to_step.py output)")
-    parser.add_argument(
-        "output_prefix",
-        help="Output path prefix; views are suffixed (e.g. PREFIX_isometric.png)",
-    )
-    parser.add_argument(
-        "--resolution", type=int, nargs=2, metavar=("W", "H"),
-        default=list(DEFAULT_RESOLUTION),
-        help="Output resolution in pixels (default: 1200 1200)",
-    )
-    parser.add_argument(
-        "--views", nargs="+", choices=["isometric", "top"],
-        default=["isometric", "top"],
-        help="Which views to render (default: isometric top)",
-    )
-    args = parser.parse_args()
 
-    render_datasheet_images(
-        args.step_file,
-        args.output_prefix,
-        resolution=tuple(args.resolution),
-        views=tuple(args.views),
+    print("=" * 60)
+    print("  STEP → Image Renderer")
+    print("=" * 60)
+
+    # 1) Input directory
+    step_dir = input("\nDirectory of Step files: ").strip()
+    if not os.path.isdir(step_dir):
+        sys.exit(f"Error: '{step_dir}' is not a valid directory.")
+
+    # 2) Output directory (default = input dir)
+    out_dir = input("Output directory [Enter = same as input]: ").strip() or step_dir
+    os.makedirs(out_dir, exist_ok=True)
+
+    # ---- discover files --------------------------------------------------
+    patterns = ("*.step", "*.STEP", "*.stp", "*.STP") 
+    files = sorted(
+        {os.path.realpath(p) for pat in patterns for p in glob.glob(os.path.join(step_dir, pat))}
     )
+    if not files:
+        sys.exit(f"No STEP files found in '{step_dir}'.")
+
+    print(f"\n{len(files)} file(s) found\n")
+
+    ok = 0
+    for f in files:
+        print(f"Processing: {os.path.basename(f)}")
+        if render_datasheet_images(
+                f,
+                os.path.splitext(os.path.basename(f))[0] + "_",
+                out_dir,
+            ):
+            ok += 1
+        print()
+
+    print(f"Done. {ok}/{len(files)} file(s) produced rendered images.")
+
+    
 
 
 if __name__ == "__main__":
