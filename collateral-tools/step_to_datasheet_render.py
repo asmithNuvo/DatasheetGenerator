@@ -156,30 +156,30 @@ def load_solids(path):
 # Color classification + materials
 # --------------------------------------------------------------------------- #
 
-def is_red(color):
-    """True if a 0-1 RGB color reads as 'red' (the gold-finish flag upstream)."""
+def is_blue(color):
+    """True if a 0-1 RGB color reads as 'blue' (the gold-finish flag upstream)."""
     if color is None:
         return False
     r, g, b = color
-    return r > 0.5 and g < 0.4 and b < 0.4
+    return r < 0.4 and g < 0.4 and b > 0.5
 
 
 def material_for(color):
     """Build a pyrender material: metallic gold for red, matte grey otherwise."""
-    if is_red(color):
-        return pyrender.MetallicRoughnessMaterial(
+    grey = list(GREY_BASE_COLOR)
+    grey[3] = GREY_ALPHA
+    if is_blue(color):
+        pyrender.MetallicRoughnessMaterial(
+            baseColorFactor=grey,
+            metallicFactor=0.1,
+            roughnessFactor=0.7,
+            alphaMode="BLEND" if GREY_ALPHA < 1.0 else "OPAQUE",
+        )
+    return pyrender.MetallicRoughnessMaterial(
             baseColorFactor=GOLD_BASE_COLOR,
             metallicFactor=0.9,
             roughnessFactor=0.35,
         )
-    grey = list(GREY_BASE_COLOR)
-    grey[3] = GREY_ALPHA
-    return pyrender.MetallicRoughnessMaterial(
-        baseColorFactor=grey,
-        metallicFactor=0.1,
-        roughnessFactor=0.7,
-        alphaMode="BLEND" if GREY_ALPHA < 1.0 else "OPAQUE",
-    )
 
 
 # --------------------------------------------------------------------------- #
